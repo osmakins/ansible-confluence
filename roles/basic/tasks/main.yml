@@ -1,0 +1,89 @@
+---
+# Config environment
+
+     - name: "Create download directory"
+       file: 
+         path: /home/{{ ansible_user }}/Downloads
+         state: directory
+         group: "{{ ansible_user }}"
+         owner: "{{ ansible_user }}"
+         mode: '0755'
+
+     - name: "Create confluence installation directory" 
+       file:
+         path: /var/confluence
+         state: directory
+         group: "{{ ansible_user }}"
+         owner: "{{ ansible_user }}"
+         mode: '0755'
+
+     - name: "Create confluence home directory"
+       file:
+         path: /var/confluence-home
+         state: directory
+         group: "{{ confluence_user }}"
+         owner: "{{ confluence_user }}"
+         mode: '0755'
+
+     - name: "Download Confluence"
+       get_url:
+          url: https://www.atlassian.com/software/confluence/downloads/binary/atlassian-confluence-7.1.0.tar.gz
+          dest: /home/{{ ansible_user }}/Downloads
+          group: "{{ ansible_user }}"
+          owner: "{{ ansible_user }}"
+          mode: '0644'
+    
+     - name: "Download Java-Mysql connector 5.1.42"
+       get_url: 
+          url: https://downloads.mysql.com/archives/get/file/mysql-connector-java-5.1.42.tar.gz 
+          dest: /home/{{ ansible_user }}/Downloads
+          group: "{{ ansible_user }}"
+          owner: "{{ ansible_user }}"
+          mode: '0644'
+     
+     - name: "Unarchive confluence to installation folder"
+       unarchive:
+           src: /home/{{ ansible_user }}/Downloads/atlassian-confluence-7.1.0.tar.gz
+           dest: /var/confluence
+           remote_src: yes
+
+     - name: "Unarchive java mysql connector"
+       unarchive:
+           src: /home/{{ ansible_user }}/Downloads/mysql-connector-java-5.1.42.tar.gz
+           dest: /var/confluence/confluence/WEB-INF/lib
+           remote_src: yes
+     
+     - name: "Download mysql repo"
+       get_url:
+          url:  http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+          dest: /home/{{ ansible_user }}/Downloads
+          group: "{{ ansible_user }}"
+          owner: "{{ ansible_user }}"
+          mode: '0644'
+
+     - name: "Install Java jdk8"
+       yum: pkg=java-1.8.0-openjdk state=installed
+
+     - name: "Install more packages"
+       yum: pkg={{ item }} state=installed
+       with_items:
+          - nmap
+          - httpd
+          - git
+          - tree
+          - lynx
+          - elinks
+          - vsftpd
+          - bind
+
+     - name: "Add mysql community to repo"
+       yum:
+          name: /home/{{ ansible_user }}/Downloads/mysql-community-release-el7-5.noarch.rpm
+          state: present
+     
+     - name: "Install mysql package"
+       yum: pkg=mysql-server state=installed
+
+     - name: "Start and enable mysql service"
+       systemd: name=mysql state=restarted enabled=yes
+
