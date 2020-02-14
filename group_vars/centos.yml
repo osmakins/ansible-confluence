@@ -1,2 +1,4 @@
 ---
 ansible_user: ansible
+confluence_user: confluence
+main_admin: root

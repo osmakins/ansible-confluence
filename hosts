@@ -44,5 +44,6 @@
 
 #centosVM
 [centos]
-ansible_node
+18.130.147.38
+
 
