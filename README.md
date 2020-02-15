@@ -1,0 +1,3 @@
+# ansible-confluence
+Deploying atlassian confluence on centos 7
+work in progress...
