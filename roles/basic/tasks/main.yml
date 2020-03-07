@@ -60,8 +60,13 @@
     become: true
     become_user: "{{main_admin}}"
   
+  - stat:
+      path: /opt/confluence/NOTICE
+    register: st
+
   - name: Rename atlassian-confluence directory
     shell: mv /opt/confluence/atlassian-confluence*/* /opt/confluence
+    when: st.stat.exists == false
     become: true
     become_user: "{{main_admin}}"
 
