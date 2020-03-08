@@ -62,11 +62,11 @@
   
   - stat:
       path: /opt/confluence/NOTICE
-    register: st
+    register: conf_dir
 
   - name: Rename atlassian-confluence directory
     shell: mv /opt/confluence/atlassian-confluence*/* /opt/confluence
-    when: st.stat.exists == false
+    when: conf_dir.stat.exists == false
     become: true
     become_user: "{{main_admin}}"
 
@@ -123,6 +123,36 @@
     yum:
       name: /home/{{confluence_user}}/Downloads/mysql-community-release-el7-5.noarch.rpm
       state: present
+    become: true
+    become_user: "{{main_admin}}"
+
+  - stat:
+      path: /opt/confluence/atlassian-confluence-7.1.0/NOTICE
+    register: conf_install_dir
+
+  - name: "Clean temporary installation files and folder"
+    shell: rm -rf /opt/confluence/atlassian-confluence-7.1.0
+    when: conf_install_dir.stat.exists == true
+    become: true
+    become_user: "{{main_admin}}"
+
+  - stat:
+      path: $HOME/Downloads/atlassian-confluence-7.1.0.tar.gz
+    register: conf_tar_dir
+
+  - name: "Clean temporary installation files and folder"
+    shell: rm -rf $HOME/Downloads/atlassian-confluence-7.1.0.tar.gz
+    when: conf_tar_dir.stat.exists == true
+    become: true
+    become_user: "{{main_admin}}"
+  
+  - stat:
+      path: $HOME/Downloads/mysql-connector-java-5.1.42.tar.gz
+    register: mysql_tar_dir
+
+  - name: "Clean temporary installation files and folder"
+    shell: rm -rf $HOME/Downloads/mysql-connector-java-5.1.42.tar.gz
+    when: mysql_tar_dir.stat.exists == true
     become: true
     become_user: "{{main_admin}}"
   
